@@ -183,9 +183,9 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 90
+  field of view: 60
   orthographic: 0
-  orthographic size: 10
+  orthographic size: 5
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
@@ -209,8 +209,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 456697579}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: -0.7358035, z: 0, w: 0.67719525}
-  m_LocalPosition: {x: 1.5825237, y: 1.016, z: -1.3866241}
+  m_LocalRotation: {x: 0.35133684, y: -0.40186536, z: 0.17046677, w: 0.82825583}
+  m_LocalPosition: {x: 7.6027117, y: 7.70003, z: -5.641333}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -281,13 +281,13 @@ AudioSource:
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 1
   SpatializePostEffects: 0
   Priority: 128
   DopplerLevel: 1
-  MinDistance: 1.3905455
+  MinDistance: 6.8204947
   MaxDistance: 500
   Pan2D: 0
   rolloffMode: 0
@@ -323,7 +323,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -479,7 +479,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: -1.51, z: 0}
-  m_LocalScale: {x: 1.5, y: 1, z: 1.5}
+  m_LocalScale: {x: 5.80455, y: 1, z: 5.80455}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -771,7 +771,7 @@ Transform:
   m_GameObject: {fileID: 1204235982}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.71, y: -0.237, z: -0.7}
+  m_LocalPosition: {x: -3.71, y: -0.36, z: -0.7}
   m_LocalScale: {x: 0.1989, y: 2.3095, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
