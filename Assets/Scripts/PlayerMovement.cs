@@ -48,7 +48,6 @@ public class PlayerMovement : MonoBehaviour
     private IEnumerator cameraZoomOutHandle;
     private IEnumerator cameraZoomInHandle;
 
-    // Start is called before the first frame update
     void Start()
     {
         controller = GetComponent<CharacterController>();
@@ -63,7 +62,6 @@ public class PlayerMovement : MonoBehaviour
         waitingForJump = false;
     }
 
-    // Update is called once per frame
     void Update()
     {
         UpdateIsGrounded();
