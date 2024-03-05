@@ -13,7 +13,7 @@ public class SonicWall : MonoBehaviour
     [SerializeField]
     private int verticalSteps;
 
-    private List<List<Vector3>> soundPoints;
+    private List<List<GameObject>> soundPoints;
     private MeshRenderer meshRenderer;
 
     private Vector3 topLeft;
@@ -45,11 +45,11 @@ public class SonicWall : MonoBehaviour
 
         if (Application.isPlaying)
         {
-            foreach (List<Vector3> list in soundPoints)
+            foreach (List<GameObject> list in soundPoints)
             {
-                foreach (Vector3 vec in list)
+                foreach (GameObject obj in list)
                 {
-                    Gizmos.DrawWireSphere(vec, 0.5f);
+                    Gizmos.DrawWireSphere(obj.transform.position, 0.5f);
                 }
             }
         }
@@ -57,20 +57,30 @@ public class SonicWall : MonoBehaviour
 
     void UpdateSoundPoints()
     {
-        soundPoints = new List<List<Vector3>>();
+        soundPoints = new List<List<GameObject>>();
 
         for (int i = 0; i <= horizontalSteps; i++)
         {
-            soundPoints.Add(new List<Vector3>());
+            soundPoints.Add(new List<GameObject>());
             for (int j = 0; j <= verticalSteps; j++)
             {
-                soundPoints[i].Add(
-                    topLeft + new Vector3(
-                        i * (meshRenderer.bounds.size.x / horizontalSteps),
-                        -(j * (meshRenderer.bounds.size.y / verticalSteps)),
-                        0f
-                    )
+                Vector3 pos = topLeft + new Vector3(
+                    i * (meshRenderer.bounds.size.x / horizontalSteps),
+                    -(j * (meshRenderer.bounds.size.y / verticalSteps)),
+                    0f
                 );
+
+                GameObject soundPoint = new GameObject($"SoundPoint{i}_{j}");
+                soundPoint.transform.position = pos;
+                soundPoint.AddComponent<AudioSource>();
+                AudioSource source = soundPoint.GetComponent<AudioSource>();
+                source.clip = sound;
+                source.playOnAwake = true;
+                source.loop = true;
+                source.spatialize = true;
+                source.spatialBlend = 1;
+                source.Play();
+                soundPoints[i].Add(soundPoint);
             }
         }
     }
