@@ -317,7 +317,7 @@ AudioSource:
   Spatialize: 1
   SpatializePostEffects: 0
   Priority: 128
-  DopplerLevel: 0
+  DopplerLevel: 1
   MinDistance: 1
   MaxDistance: 15
   Pan2D: 0
@@ -2416,7 +2416,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1495155319
 Transform:
   m_ObjectHideFlags: 0
@@ -2472,8 +2472,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f7996c878cbdb8148bb528753cd4f7d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  source: {fileID: 526199147}
-  decayDelay: 0.5
+  audioSource: {fileID: 526199147}
+  decayDelay: 0.75
+  decayRate: 0.1
 --- !u!1 &1552514523
 GameObject:
   m_ObjectHideFlags: 0
@@ -2484,13 +2485,14 @@ GameObject:
   m_Component:
   - component: {fileID: 1552514524}
   - component: {fileID: 1552514525}
+  - component: {fileID: 1552514526}
   m_Layer: 0
   m_Name: Sound Wall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1552514524
 Transform:
   m_ObjectHideFlags: 0
@@ -2500,7 +2502,7 @@ Transform:
   m_GameObject: {fileID: 1552514523}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.57, y: 2.11, z: 4.42}
+  m_LocalPosition: {x: -0.57, y: 1.84, z: 5.1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2523,6 +2525,33 @@ MonoBehaviour:
   horizontalSteps: 8
   verticalSteps: 8
   meshRenderer: {fileID: 1717570003}
+--- !u!54 &1552514526
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1552514523}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &1717570001
 GameObject:
   m_ObjectHideFlags: 0
@@ -2782,7 +2811,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1916028767
 MonoBehaviour:
   m_ObjectHideFlags: 0

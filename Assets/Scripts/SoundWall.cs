@@ -53,16 +53,34 @@ public class SoundWall : MonoBehaviour
         }
     }
 
-    private void InitAudioSource(AudioSource source)
+    private void InitSoundObject(GameObject soundPointObj)
     {
+        soundPointObj.AddComponent<AudioSource>();
+        AudioSource source = soundPointObj.GetComponent<AudioSource>();
+
         source.clip = sound;
-        source.playOnAwake = true;
+        source.playOnAwake = false;
         source.loop = true;
+
+        // 3D Settings
         source.spatialize = true;
         source.spatialBlend = 1;
+        source.rolloffMode = AudioRolloffMode.Linear;
+        source.minDistance = 1;
+        source.maxDistance = 15;
+
+        soundPointObj.AddComponent<SphereCollider>();
+        SphereCollider collider = soundPointObj.GetComponent<SphereCollider>();
+        collider.radius = 1f;
+        // TODO: can triggers detect triggers?
+        collider.isTrigger = true;
+
+        soundPointObj.AddComponent<SoundObject>();
+        SoundObject obj = soundPointObj.GetComponent<SoundObject>();
+        obj.audioSource = source;
 
         // TODO: parameterize wall sweep vs full grid play
-        //source.Play();
+        // source.Play();
     }
 
     private void UpdateSoundPoints()
@@ -82,9 +100,9 @@ public class SoundWall : MonoBehaviour
 
                 GameObject soundPoint = new GameObject($"SoundPoint{i}_{j}");
                 soundPoint.transform.position = pos;
+                soundPoint.transform.parent = transform;
 
-                soundPoint.AddComponent<AudioSource>();
-                InitAudioSource(soundPoint.GetComponent<AudioSource>());
+                InitSoundObject(soundPoint);
 
                 soundPoints[i].Add(soundPoint);
             }
