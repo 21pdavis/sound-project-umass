@@ -3,8 +3,14 @@ using UnityEngine;
 
 public static class Helpers
 {
-    public static IEnumerator DecaySound(AudioSource source, float decayRate=0.025f)
+    public static IEnumerator DecaySound(AudioSource source, float decayRate=0.025f, float timeAtMaxVolume=0f)
     {
+        float startTime = Time.time;
+        while (Time.time < startTime + timeAtMaxVolume)
+        {
+            yield return new WaitForEndOfFrame();
+        }
+
         while (source.volume > 0)
         {
             Debug.Log($"Source volume is {source.volume}");
