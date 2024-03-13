@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,7 +14,16 @@ public class SoundWall : MonoBehaviour
     private int verticalSteps;
 
     [SerializeField]
+    private bool sweep;
+
+    [SerializeField]
+    private float sweepSpeed;
+
+    [SerializeField]
     private MeshRenderer meshRenderer;
+
+    [Header("References")]
+    private GameObject soundPointPrefab;
 
     private List<List<GameObject>> soundPoints;
 
@@ -23,12 +33,12 @@ public class SoundWall : MonoBehaviour
 
     private void Start()
     {
-        topLeft = transform.position - meshRenderer.bounds.size.x / 2 * Vector3.right + meshRenderer.bounds.size.y / 2 * Vector3.up;
+        topLeft = transform.position - meshRenderer.bounds.size.x / 2 * transform.right + meshRenderer.bounds.size.y / 2 * transform.up;
     }
 
     private void Update()
     {
-        if (currTotalSteps != totalSteps)
+        if (currTotalSteps != totalSteps && !sweep)
         {
             totalSteps = currTotalSteps;
             UpdateSoundPoints();
@@ -41,7 +51,7 @@ public class SoundWall : MonoBehaviour
     {
         Gizmos.color = Color.green;
 
-        if (Application.isPlaying)
+        if (Application.isPlaying && soundPoints != null)
         {
             foreach (List<GameObject> list in soundPoints)
             {
@@ -53,10 +63,13 @@ public class SoundWall : MonoBehaviour
         }
     }
 
-    private void InitSoundObject(GameObject soundPointObj)
+    private GameObject InitSoundObject(GameObject soundPoint, Vector3 pos)
     {
-        soundPointObj.AddComponent<AudioSource>();
-        AudioSource source = soundPointObj.GetComponent<AudioSource>();
+        soundPoint.transform.position = pos;
+        soundPoint.transform.parent = transform;
+
+        soundPoint.AddComponent<AudioSource>();
+        AudioSource source = soundPoint.GetComponent<AudioSource>();
 
         source.clip = sound;
         source.playOnAwake = false;
@@ -68,19 +81,18 @@ public class SoundWall : MonoBehaviour
         source.rolloffMode = AudioRolloffMode.Linear;
         source.minDistance = 1;
         source.maxDistance = 15;
+        source.volume = 1f;
 
-        soundPointObj.AddComponent<SphereCollider>();
-        SphereCollider collider = soundPointObj.GetComponent<SphereCollider>();
+        soundPoint.AddComponent<SphereCollider>();
+        SphereCollider collider = soundPoint.GetComponent<SphereCollider>();
         collider.radius = 1f;
-        // TODO: can triggers detect triggers?
         collider.isTrigger = true;
 
-        soundPointObj.AddComponent<SoundObject>();
-        SoundObject obj = soundPointObj.GetComponent<SoundObject>();
-        obj.audioSource = source;
+        //soundPoint.AddComponent<SoundObject>();
+        //SoundObject obj = soundPoint.GetComponent<SoundObject>();
+        //obj.audioSource = source;
 
-        // TODO: parameterize wall sweep vs full grid play
-        // source.Play();
+        return soundPoint;
     }
 
     private void UpdateSoundPoints()
@@ -98,14 +110,27 @@ public class SoundWall : MonoBehaviour
                     0f
                 );
 
-                GameObject soundPoint = new GameObject($"SoundPoint{i}_{j}");
-                soundPoint.transform.position = pos;
-                soundPoint.transform.parent = transform;
-
-                InitSoundObject(soundPoint);
-
-                soundPoints[i].Add(soundPoint);
+                soundPoints[i].Add(InitSoundObject(new GameObject($"SoundPoint{i}_{j}"), pos));
             }
+        }
+    }
+
+    private IEnumerator SweepSound(GameObject soundPoint)
+    {
+        while (soundPoint.transform.position.x < (transform.position - meshRenderer.bounds.size.x / 2 * transform.right).x)
+        {
+            soundPoint.transform.position -= 0.001f * transform.right;
+            yield return new WaitForEndOfFrame();
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (sweep && other.CompareTag("SoundPulse"))
+        {
+            Vector3 pos = transform.position + (meshRenderer.bounds.size.x / 2) * transform.right;
+            //StartCoroutine(SweepSound(InitSoundObject(new GameObject("SweepSoundPoint"), pos)));
+            StartCoroutine(SweepSound(Instantiate(soundPointPrefab, pos, Quaternion.identity)));
         }
     }
 }

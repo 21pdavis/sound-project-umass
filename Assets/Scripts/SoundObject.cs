@@ -4,7 +4,8 @@ using static Helpers;
 
 public class SoundObject : MonoBehaviour
 {
-    public AudioSource audioSource;
+    [SerializeField]
+    private AudioClip soundClip;
 
     [SerializeField]
     [Tooltip("Time before the sound begins to decay")]
@@ -14,20 +15,23 @@ public class SoundObject : MonoBehaviour
     [Tooltip("The value subtracted from the source's volume every 0.1 seconds")]
     private float decayRate = 0.1f;
 
+    [Header("References")]
+    [SerializeField]
+    private GameObject soundPointPrefab;
+
     private void OnTriggerEnter(Collider collider)
     {
         if (collider.CompareTag("SoundPulse"))
         {
             Debug.Log($"Playing sound in object {gameObject.name}");
 
-            audioSource.volume = 1;
-            audioSource.Play();
-            StartCoroutine(DecaySound(audioSource, decayRate: decayRate, timeAtMaxVolume: decayDelay));
+            // TODO: get contact point as spawn point for soundPoint
+            GameObject soundPoint = Instantiate(soundPointPrefab, transform.position, Quaternion.identity, transform);
+            AudioSource source = soundPoint.GetComponent<AudioSource>();
+            source.volume = 1;
+            source.clip = soundClip;
+            source.Play();
+            StartCoroutine(DecaySound(source, decayRate: decayRate, timeAtMaxVolume: decayDelay, destroyObject: true));
         }
-    }
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        Debug.Log("entered");
     }
 }

@@ -3,7 +3,7 @@ using UnityEngine;
 
 public static class Helpers
 {
-    public static IEnumerator DecaySound(AudioSource source, float decayRate=0.025f, float timeAtMaxVolume=0f)
+    public static IEnumerator DecaySound(AudioSource source, float decayRate=0.025f, float timeAtMaxVolume=0f, bool destroyObject=false)
     {
         float startTime = Time.time;
         while (Time.time < startTime + timeAtMaxVolume)
@@ -19,6 +19,13 @@ public static class Helpers
         }
 
         source.Stop();
-        source.volume = 1;
+        if (destroyObject )
+        {
+            Object.Destroy(source.gameObject);
+        }
+        else
+        {
+            source.volume = 1;
+        }
     }
 }
