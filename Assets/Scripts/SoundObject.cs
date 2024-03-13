@@ -29,6 +29,7 @@ public class SoundObject : MonoBehaviour
             GameObject soundPoint = Instantiate(soundPointPrefab, transform.position, Quaternion.identity, transform);
             AudioSource source = soundPoint.GetComponent<AudioSource>();
             source.volume = 1;
+            source.pitch = 1.5f;
             source.clip = soundClip;
             source.Play();
             StartCoroutine(DecaySound(source, decayRate: decayRate, timeAtMaxVolume: decayDelay, destroyObject: true));

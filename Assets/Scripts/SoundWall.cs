@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEditor.PlayerSettings;
 
 public class SoundWall : MonoBehaviour
 {
     [SerializeField]
-    private AudioClip sound;
+    private AudioClip soundClip;
 
     [SerializeField]
     private int horizontalSteps;
@@ -23,6 +24,7 @@ public class SoundWall : MonoBehaviour
     private MeshRenderer meshRenderer;
 
     [Header("References")]
+    [SerializeField]
     private GameObject soundPointPrefab;
 
     private List<List<GameObject>> soundPoints;
@@ -30,6 +32,9 @@ public class SoundWall : MonoBehaviour
     private Vector3 topLeft;
     private int totalSteps = -1;
     private int currTotalSteps;
+
+    //! DEBUG
+    private GameObject sweepPoint;
 
     private void Start()
     {
@@ -51,14 +56,22 @@ public class SoundWall : MonoBehaviour
     {
         Gizmos.color = Color.green;
 
-        if (Application.isPlaying && soundPoints != null)
+        if (Application.isPlaying)
         {
-            foreach (List<GameObject> list in soundPoints)
+            if (soundPoints != null)
             {
-                foreach (GameObject obj in list)
+                foreach (List<GameObject> list in soundPoints)
                 {
-                    Gizmos.DrawWireSphere(obj.transform.position, 0.5f);
+                    foreach (GameObject obj in list)
+                    {
+                        Gizmos.DrawWireSphere(obj.transform.position, 0.5f);
+                    }
                 }
+            }
+
+            if (sweepPoint != null)
+            {
+               Gizmos.DrawWireSphere(sweepPoint.transform.position, 1f);
             }
         }
     }
@@ -71,7 +84,7 @@ public class SoundWall : MonoBehaviour
         soundPoint.AddComponent<AudioSource>();
         AudioSource source = soundPoint.GetComponent<AudioSource>();
 
-        source.clip = sound;
+        source.clip = soundClip;
         source.playOnAwake = false;
         source.loop = true;
 
@@ -115,22 +128,29 @@ public class SoundWall : MonoBehaviour
         }
     }
 
-    private IEnumerator SweepSound(GameObject soundPoint)
+    private IEnumerator SweepSound(GameObject soundPoint, Vector3 destination)
     {
-        while (soundPoint.transform.position.x < (transform.position - meshRenderer.bounds.size.x / 2 * transform.right).x)
+        while (Vector3.Distance(soundPoint.transform.position, destination) > 0.01f)
         {
-            soundPoint.transform.position -= 0.001f * transform.right;
+            soundPoint.transform.position -= Time.deltaTime * sweepSpeed * transform.right;
             yield return new WaitForEndOfFrame();
         }
+
+        Destroy(soundPoint);
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (sweep && other.CompareTag("SoundPulse"))
         {
-            Vector3 pos = transform.position + (meshRenderer.bounds.size.x / 2) * transform.right;
-            //StartCoroutine(SweepSound(InitSoundObject(new GameObject("SweepSoundPoint"), pos)));
-            StartCoroutine(SweepSound(Instantiate(soundPointPrefab, pos, Quaternion.identity)));
+            Vector3 pos = transform.position + (meshRenderer.bounds.size.x / 1.5f) * transform.right;
+
+            sweepPoint = Instantiate(soundPointPrefab, pos, Quaternion.identity, transform);
+            AudioSource source = sweepPoint.GetComponent<AudioSource>();
+            source.clip = soundClip;
+            source.Play();
+
+            StartCoroutine(SweepSound(sweepPoint, transform.position - meshRenderer.bounds.size.x / 1.5f * transform.right));
         }
     }
 }
