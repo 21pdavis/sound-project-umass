@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEditor.PlayerSettings;
+using UnityEngine.Events;
 
 public class SoundWall : MonoBehaviour
 {
+    private UnityEvent<GameObject, Vector3> PulseCollide = new();
+
     [SerializeField]
     private AudioClip soundClip;
 
@@ -20,8 +22,12 @@ public class SoundWall : MonoBehaviour
     [SerializeField]
     private float sweepSpeed;
 
-    [SerializeField]
-    private MeshRenderer meshRenderer;
+    public Transform sweepStart;
+
+    public Transform sweepEnd;
+
+    //[SerializeField]
+    //private MeshRenderer meshRenderer;
 
     [Header("References")]
     [SerializeField]
@@ -34,11 +40,13 @@ public class SoundWall : MonoBehaviour
     private int currTotalSteps;
 
     //! DEBUG
-    private GameObject sweepPoint;
+    private GameObject sweepPoint1;
+    private GameObject sweepPoint2;
 
     private void Start()
     {
-        topLeft = transform.position - meshRenderer.bounds.size.x / 2 * transform.right + meshRenderer.bounds.size.y / 2 * transform.up;
+        //! assumes that the parent is the room
+        PulseCollide.AddListener(transform.parent.GetComponent<Room>().StartSweep);
     }
 
     private void Update()
@@ -46,7 +54,6 @@ public class SoundWall : MonoBehaviour
         if (currTotalSteps != totalSteps && !sweep)
         {
             totalSteps = currTotalSteps;
-            UpdateSoundPoints();
         }
 
         currTotalSteps = horizontalSteps * verticalSteps;
@@ -69,9 +76,9 @@ public class SoundWall : MonoBehaviour
                 }
             }
 
-            if (sweepPoint != null)
+            if (sweepPoint1 != null)
             {
-               Gizmos.DrawWireSphere(sweepPoint.transform.position, 1f);
+               Gizmos.DrawWireSphere(sweepPoint1.transform.position, 1f);
             }
         }
     }
@@ -108,31 +115,33 @@ public class SoundWall : MonoBehaviour
         return soundPoint;
     }
 
-    private void UpdateSoundPoints()
-    {
-        soundPoints = new List<List<GameObject>>();
+    //private void UpdateSoundPoints()
+    //{
+    //    soundPoints = new List<List<GameObject>>();
 
-        for (int i = 0; i <= horizontalSteps; i++)
-        {
-            soundPoints.Add(new List<GameObject>());
-            for (int j = 0; j <= verticalSteps; j++)
-            {
-                Vector3 pos = topLeft + new Vector3(
-                    i * (meshRenderer.bounds.size.x / horizontalSteps),
-                    -(j * (meshRenderer.bounds.size.y / verticalSteps)),
-                    0f
-                );
+    //    for (int i = 0; i <= horizontalSteps; i++)
+    //    {
+    //        soundPoints.Add(new List<GameObject>());
+    //        for (int j = 0; j <= verticalSteps; j++)
+    //        {
+    //            Vector3 pos = topLeft + new Vector3(
+    //                i * (meshRenderer.bounds.size.x / horizontalSteps),
+    //                -(j * (meshRenderer.bounds.size.y / verticalSteps)),
+    //                0f
+    //            );
 
-                soundPoints[i].Add(InitSoundObject(new GameObject($"SoundPoint{i}_{j}"), pos));
-            }
-        }
-    }
+    //            soundPoints[i].Add(InitSoundObject(new GameObject($"SoundPoint{i}_{j}"), pos));
+    //        }
+    //    }
+    //}
 
     private IEnumerator SweepSound(GameObject soundPoint, Vector3 destination)
     {
-        while (Vector3.Distance(soundPoint.transform.position, destination) > 0.01f)
+        Vector3 direction = -(destination - soundPoint.transform.position).normalized;
+
+        while (Vector3.Distance(soundPoint.transform.position, destination) > 0.1f)
         {
-            soundPoint.transform.position -= Time.deltaTime * sweepSpeed * transform.right;
+            soundPoint.transform.position -= Time.deltaTime * sweepSpeed * direction;
             yield return new WaitForEndOfFrame();
         }
 
@@ -143,14 +152,8 @@ public class SoundWall : MonoBehaviour
     {
         if (sweep && other.CompareTag("SoundPulse"))
         {
-            Vector3 pos = transform.position + (meshRenderer.bounds.size.x / 1.5f) * transform.right;
-
-            sweepPoint = Instantiate(soundPointPrefab, pos, Quaternion.identity, transform);
-            AudioSource source = sweepPoint.GetComponent<AudioSource>();
-            source.clip = soundClip;
-            source.Play();
-
-            StartCoroutine(SweepSound(sweepPoint, transform.position - meshRenderer.bounds.size.x / 1.5f * transform.right));
+            Vector3 contactPoint = other.gameObject.GetComponent<Collider>().ClosestPointOnBounds(transform.position);
+            PulseCollide.Invoke(gameObject, contactPoint);
         }
     }
 }

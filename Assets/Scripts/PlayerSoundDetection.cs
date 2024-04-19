@@ -34,6 +34,7 @@ public class PlayerSoundDetection : MonoBehaviour
 
     private void SpawnSoundPulse()
     {
+        Debug.Log("Pulse");
         hasPulsed = true;
         lastPulseTime = Time.time;
         Instantiate(soundPulse, soundOrigin.position, Quaternion.identity);
